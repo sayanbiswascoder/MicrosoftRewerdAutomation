@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width">
+    <title>search</title>
+  <style>
+    body{
+      height: 40vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: end;
+    }
+    .cont{
+      
+      width: 80vw;
+      height: 65px;
+    }
+    .progress{
+      background-color: #3cff3bab;
+      height: 40%;
+      width: 0;
+    }
+
+    #load{
+      visibility: hidden;
+      animation-name: load;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      margin-left: 15px;
+      margin-right: 15px;
+    }
+
+    .state{
+      font-size: 5rem;
+    }
+
+    .state-cont{
+      display: flex;
+      margin-top: 10px;
+    }
+    
+    @media (min-width:765px){
+      .cont{
+        width: 40vw;
+      }
+    }
+
+    @keyframes load {
+      from{
+        transform: rotate(0deg);
+      }
+      to{
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  </head>
+  <body>
+    <div class="cont">
+      <div class="progress">
+      </div>
+      <div class="state-cont">
+        <img src="https://pic.onlinewebfonts.com/svg/img_80150.png" alt="loading" width="50" height="50" id="load">
+        <h3 id="state"></h3>
+      </div>
+    </div>
+    <iframe id="iframe" hidden src="" style="width:100%;height:300px"></iframe>
+  <script type="text/javascript" charset="utf-8">
+  let progress = document.getElementsByClassName("progress")[0]
+  let load = document.getElementById("load")
+  let state = document.getElementById("state")
+  let iframe = document.getElementById("iframe")
+    window.onload = ()=>{
+      const func =async () =>{
+        load.style.visibility = 'visible'
+        load.style.animationName = 'load'
+        state.innerHTML = `Finding platform`
+        await new Promise(r => setTimeout(r, 600));
+        let searchCount;
+        
+        if(navigator.userAgent.indexOf("Windows") !== -1){
+          searchCount = 35
+        }
+        else if(navigator.userAgent.indexOf("Linux") !== -1){
+          searchCount = 25
+        }
+        
+        state.innerHTML = `platform found - ${navigator.userAgent.indexOf("Linux") !== -1 ? 'Android':'Windows'}`
+        await new Promise(r => setTimeout(r, 700));
+        state.innerHTML = `Opening Tab - ${searchCount}`
+        await new Promise(r => setTimeout(r, 300));
+        for(let i =1;i < searchCount+1;i++){
+          state.innerHTML = `Opening Tab - ${i}`
+          if(navigator.userAgent.indexOf("Windows") !== -1){
+            let tab = await window.open(`https://www.bing.com/search?q=searchQuery-${i}`)
+            tab.close()
+          }
+          else if(navigator.userAgent.indexOf("Linux") !== -1){
+            iframe.src = `https://www.bing.com/search?q=searchQuery-${i}`
+            console.log(iframe)
+          }
+          await new Promise(r => setTimeout(r, 300));
+          progress.style.width = `${(i/searchCount)*100}%`
+          //console.log(tab)
+        }
+        state.innerHTML = `Complete`
+        progress.style.width = '100%'
+        load.style.display = 'none'
+      }
+      func()
+    }
+    
+  </script>
+  </body>
+</html>
